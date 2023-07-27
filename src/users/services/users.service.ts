@@ -1,9 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { User } from 'src/entities/user.entity';
+import { UserEntity } from 'src/users/entities/user.entity';
+import { FileEntity } from 'src/files/entities/file.entity';
+
+import { FilesService } from 'src/files/services/files.service';
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [
+  constructor(private filesService: FilesService) {}
+
+  private users: UserEntity[] = [
     {
       id: 1,
       email: 'jessica@gmail.com',
@@ -42,5 +47,13 @@ export class UsersService {
       return this.users[index];
     }
     return null;
+  }
+
+  fetchFiles(id: number) {
+    const user = this.findOne(id);
+    return {
+      user,
+      files: this.filesService.findOne(id),
+    };
   }
 }
