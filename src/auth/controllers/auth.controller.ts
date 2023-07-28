@@ -4,6 +4,7 @@ import { LoginDto } from '../dtos/login.dto';
 import { Request } from 'express';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthService } from '../services/auth.service';
+import { UserEntity } from 'src/users/entities/user.entity';
 
 @ApiTags('Auth Endpoints')
 @Controller('auth')
@@ -21,6 +22,7 @@ export class AuthController {
   @Post('login')
   @ApiOperation({ summary: 'Login' })
   login(@Req() Req: Request) {
-    return Req.user;
+    const user = Req.user as UserEntity;
+    return this.authService.generateJWT(user);
   }
 }

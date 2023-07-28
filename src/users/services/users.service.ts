@@ -23,7 +23,9 @@ export class UsersService {
     });
     if (!userFind) throw new NotFoundException(`User ${email} not found`);
     else {
-      return bcrypt.compare(password, userFind.password) ? userFind : null;
+      const compare = await bcrypt.compare(password, userFind.password);
+      if (compare) return userFind;
+      else return null;
     }
   }
 

@@ -15,9 +15,11 @@ import { CreateUserDto, UpdateUserDto } from 'src/users/dtos/users.dto';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
 import { Public } from 'src/auth/decorators/public.decorator';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('User Endpoints')
-@UseGuards(ApiKeyGuard)
+//@UseGuards(ApiKeyGuard)
+@UseGuards(AuthGuard('jwt'))
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}

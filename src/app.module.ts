@@ -28,6 +28,7 @@ import config from './common/config';
         POSTGRES_PASSWORD: Joi.string().required(),
         POSTGRES_HOST: Joi.string().required(),
         API_KEY: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
       }),
     }),
     UsersModule,
