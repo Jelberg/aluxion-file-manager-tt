@@ -29,16 +29,4 @@ export class CreateUserDto {
   readonly lastname: string;
 }
 
-export class LoginUserDto {
-  @IsEmail()
-  @IsNotEmpty()
-  @ApiProperty({ description: 'Email address from Login' })
-  readonly email: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @ApiProperty({ description: 'Password address from Login' })
-  password: string;
-}
-
 export class UpdateUserDto extends PartialType(CreateUserDto) {}

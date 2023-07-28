@@ -7,31 +7,34 @@ import {
   Put,
   Delete,
   ParseIntPipe,
+  UseGuards,
+  SetMetadata,
 } from '@nestjs/common';
 import { UsersService } from 'src/users/services/users.service';
-import {
-  CreateUserDto,
-  UpdateUserDto,
-  LoginUserDto,
-} from 'src/users/dtos/users.dto';
+import { CreateUserDto, UpdateUserDto } from 'src/users/dtos/users.dto';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiKeyGuard } from 'src/auth/guards/api-key.guard';
+import { Public } from 'src/auth/decorators/public.decorator';
 
 @ApiTags('User Endpoints')
+@UseGuards(ApiKeyGuard)
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get('all')
+  @Public()
   @ApiOperation({ summary: 'Get all users' })
   all() {
     return this.usersService.findAll();
   }
 
-  @Post('login')
+  /*@Post('login')
+  @Public()
   @ApiOperation({ summary: 'Login' })
   login(@Body() data: LoginUserDto) {
     return this.usersService.login(data);
-  }
+  }*/
 
   @Get(':id')
   @ApiOperation({ summary: 'Get user by ID' })
@@ -40,6 +43,7 @@ export class UsersController {
   }
 
   @Post()
+  @Public()
   @ApiOperation({ summary: 'Create user' })
   creator(@Body() user: CreateUserDto) {
     return this.usersService.create(user);

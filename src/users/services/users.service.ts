@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
 import { FilesService } from 'src/files/services/files.service';
-import { CreateUserDto, LoginUserDto, UpdateUserDto } from '../dtos/users.dto';
+import { CreateUserDto, UpdateUserDto } from '../dtos/users.dto';
 import { isNotEmpty } from 'class-validator';
 
 @Injectable()
@@ -17,13 +17,13 @@ export class UsersService {
     private filesService: FilesService,
   ) {}
 
-  async login(user: LoginUserDto) {
+  async login(email: string, password: string) {
     const userFind = await this.userRepository.findOne({
-      where: { email: user.email },
+      where: { email: email },
     });
-    if (!userFind) throw new NotFoundException(`User ${user.email} not found`);
+    if (!userFind) throw new NotFoundException(`User ${email} not found`);
     else {
-      return bcrypt.compare(user.password, userFind.password);
+      return bcrypt.compare(password, userFind.password) ? userFind : null;
     }
   }
 
@@ -67,12 +67,11 @@ export class UsersService {
     }
 
     if (isNotEmpty(data.password)) {
-      data.password = await bcrypt.hash(data.password, 10);
+      (data.password as string) = await bcrypt.hash(data.password, 10);
     }
 
-    console.log('-----------------------------------');
     const user = await this.findOne(id);
-    const updtUser = await this.userRepository.merge(user, data);
+    const updtUser = this.userRepository.merge(user, data);
     console.log(updtUser);
     return this.userRepository.save(updtUser);
   }

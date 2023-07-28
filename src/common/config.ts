@@ -14,5 +14,8 @@ export default registerAs('config', () => {
       bucket: process.env.AWS_BUCKET,
       secret: process.env.AWS_SECRET,
     },
+    api: {
+      key: process.env.API_KEY,
+    },
   };
 });

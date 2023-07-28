@@ -8,6 +8,8 @@ import { UsersModule } from './users/users.module';
 import { FilesModule } from './files/files.module';
 import { DatabaseModule } from './database/database.module';
 import { enviroments } from './common/enviroments';
+import { AuthModule } from './auth/auth.module';
+
 import config from './common/config';
 
 @Module({
@@ -25,11 +27,13 @@ import config from './common/config';
         POSTGRES_PORT: Joi.number().required(),
         POSTGRES_PASSWORD: Joi.string().required(),
         POSTGRES_HOST: Joi.string().required(),
+        API_KEY: Joi.string().required(),
       }),
     }),
     UsersModule,
     FilesModule,
     DatabaseModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

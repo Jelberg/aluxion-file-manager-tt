@@ -1,17 +1,14 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
+import { ApiKeyGuard } from './auth/guards/api-key.guard';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+  @UseGuards(ApiKeyGuard)
   @Get('hello')
   getHello(): string {
     return this.appService.getHello();
-  }
-
-  @Get('info')
-  getInfo() {
-    return this.appService.getUsers();
   }
 }
