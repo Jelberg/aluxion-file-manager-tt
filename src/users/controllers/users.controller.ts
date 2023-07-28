@@ -9,7 +9,11 @@ import {
   ParseIntPipe,
 } from '@nestjs/common';
 import { UsersService } from 'src/users/services/users.service';
-import { CreateUserDto, UpdateUserDto } from 'src/users/dtos/users.dto';
+import {
+  CreateUserDto,
+  UpdateUserDto,
+  LoginUserDto,
+} from 'src/users/dtos/users.dto';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
 @ApiTags('User Endpoints')
@@ -23,6 +27,12 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
+  @Post('login')
+  @ApiOperation({ summary: 'Login' })
+  login(@Body() data: LoginUserDto) {
+    return this.usersService.login(data);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get user by ID' })
   getUser(@Param('id', ParseIntPipe) id: number) {
@@ -31,10 +41,8 @@ export class UsersController {
 
   @Post()
   @ApiOperation({ summary: 'Create user' })
-  creator(@Body() payload: CreateUserDto) {
-    return {
-      payload: payload,
-    };
+  creator(@Body() user: CreateUserDto) {
+    return this.usersService.create(user);
   }
 
   @Put(':id')
@@ -46,9 +54,7 @@ export class UsersController {
   @Delete(':id')
   @ApiOperation({ summary: 'Delete user by ID' })
   delete(@Param('id') id: number) {
-    return {
-      id: id,
-    };
+    return this.usersService.delete(id);
   }
 
   @Get(':id/files')

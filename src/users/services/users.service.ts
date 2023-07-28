@@ -2,8 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserEntity } from 'src/users/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm/dist/common';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 import { FilesService } from 'src/files/services/files.service';
+import { CreateUserDto, LoginUserDto, UpdateUserDto } from '../dtos/users.dto';
+import { isNotEmpty } from 'class-validator';
 
 @Injectable()
 export class UsersService {
@@ -14,45 +17,70 @@ export class UsersService {
     private filesService: FilesService,
   ) {}
 
-  private users: UserEntity[] = [
-    {
-      id: 1,
-      email: 'jessica@gmail.com',
-      password: 'jessica',
-      name: 'jessica',
-      lastname: 'elberg',
-    },
-  ];
-
-  findAll() {
-    return this.userRepository.find();
+  async login(user: LoginUserDto) {
+    const userFind = await this.userRepository.findOne({
+      where: { email: user.email },
+    });
+    if (!userFind) throw new NotFoundException(`User ${user.email} not found`);
+    else {
+      return bcrypt.compare(user.password, userFind.password);
+    }
   }
 
-  findOne(id: number) {
-    const user = this.users.find((item) => item.id == id);
+  async findAll() {
+    return await this.userRepository.find();
+  }
+
+  async findOne(id: number) {
+    const user = await this.userRepository.findOne({ where: { id: id } });
     if (!user) throw new NotFoundException(`User ${id} not found`);
     else return user;
   }
 
-  create(payload: any) {
-    const newUser = {
-      id: payload.id,
-      ...payload,
-    };
+  async isEmailExist(email: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({
+      where: { email: email },
+    });
+    if (user) throw new NotFoundException(`Email: ${email} is already taken`);
+    else return false;
   }
 
-  update(id: number, payload: any) {
-    const user = this.findOne(id);
-    if (user) {
-      const index = this.users.findIndex((item) => item.id == id);
-      console.log(index);
-      this.users[index] = {
-        ...user,
-        ...payload,
-      };
-      return this.users[index];
+  async create(data: CreateUserDto) {
+    const userValid = await this.isEmailExist(data.email);
+    if (userValid) {
+      throw new NotFoundException(`Email: ${data.email} is already taken`);
+    } else {
+      const newUser = new UserEntity();
+      const encryp = await bcrypt.hash(data.password, 10);
+
+      newUser.email = data.email;
+      newUser.password = encryp;
+      newUser.name = data.name;
+      newUser.lastname = data.lastname;
+      return await this.userRepository.save(newUser);
     }
-    return null;
+  }
+
+  async update(id: number, data: UpdateUserDto) {
+    if (isNotEmpty(data.email)) {
+      await this.isEmailExist(data.email);
+    }
+
+    if (isNotEmpty(data.password)) {
+      data.password = await bcrypt.hash(data.password, 10);
+    }
+
+    console.log('-----------------------------------');
+    const user = await this.findOne(id);
+    const updtUser = await this.userRepository.merge(user, data);
+    console.log(updtUser);
+    return this.userRepository.save(updtUser);
+  }
+
+  async delete(id: number) {
+    return await this.findOne(id).then(async () => {
+      return await this.userRepository.delete(id);
+    });
   }
 
   fetchFiles(id: number) {
