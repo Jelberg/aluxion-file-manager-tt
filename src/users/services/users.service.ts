@@ -1,12 +1,18 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserEntity } from 'src/users/entities/user.entity';
-import { FileEntity } from 'src/files/entities/file.entity';
+import { InjectRepository } from '@nestjs/typeorm/dist/common';
+import { Repository } from 'typeorm';
 
 import { FilesService } from 'src/files/services/files.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private filesService: FilesService) {}
+  constructor(
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
+
+    private filesService: FilesService,
+  ) {}
 
   private users: UserEntity[] = [
     {
@@ -19,7 +25,7 @@ export class UsersService {
   ];
 
   findAll() {
-    return this.users;
+    return this.userRepository.find();
   }
 
   findOne(id: number) {

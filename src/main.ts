@@ -14,13 +14,13 @@ async function bootstrap() {
   );
 
   const config = new DocumentBuilder()
-    .setTitle('API')
+    .setTitle('Aluxion API - Tecnical Test')
     .setDescription('API Documentation - Files Manager')
     .setVersion('1.0')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(3000);
+  await app.listen(process.env.PORT || 3000);
 }
 bootstrap();
