@@ -8,20 +8,30 @@ import { UsersModule } from 'src/users/users.module';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { AuthController } from './controllers/auth.controller';
+import { MailerModule } from 'src/mailer/mailer.module';
 import config from 'src/common/config';
 
 @Module({
   imports: [
     PassportModule,
     UsersModule,
+    MailerModule,
     JwtModule.registerAsync({
       inject: [config.KEY],
       useFactory: (configService: ConfigType<typeof config>) => {
         return {
           secret: configService.api.jwtSecret,
           signOptions: {
-            expiresIn: '2m',
+            expiresIn: '5h',
           },
+        };
+      },
+    }),
+    JwtModule.registerAsync({
+      inject: [config.KEY],
+      useFactory: (configService: ConfigType<typeof config>) => {
+        return {
+          secret: configService.api.jwtSecretRecovery,
         };
       },
     }),

@@ -9,6 +9,7 @@ import { FilesModule } from './files/files.module';
 import { DatabaseModule } from './database/database.module';
 import { enviroments } from './common/enviroments';
 import { AuthModule } from './auth/auth.module';
+import { MailerModule } from './mailer/mailer.module';
 
 import config from './common/config';
 
@@ -29,12 +30,15 @@ import config from './common/config';
         POSTGRES_HOST: Joi.string().required(),
         API_KEY: Joi.string().required(),
         JWT_SECRET: Joi.string().required(),
+        API_KEY_RECOVERY: Joi.string().required(),
+        JWT_SECRET_RECOVERY: Joi.string().required(),
       }),
     }),
     UsersModule,
     FilesModule,
     DatabaseModule,
     AuthModule,
+    MailerModule,
   ],
   controllers: [AppController],
   providers: [AppService],

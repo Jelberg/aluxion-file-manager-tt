@@ -31,13 +31,6 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  /*@Post('login')
-  @Public()
-  @ApiOperation({ summary: 'Login' })
-  login(@Body() data: LoginUserDto) {
-    return this.usersService.login(data);
-  }*/
-
   @Get(':id')
   @ApiOperation({ summary: 'Get user by ID' })
   getUser(@Param('id', ParseIntPipe) id: number) {

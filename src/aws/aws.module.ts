@@ -6,5 +6,6 @@ Global();
 @Module({
   providers: [AwsService],
   controllers: [AwsController],
+  exports: [AwsService],
 })
 export class AwsModule {}

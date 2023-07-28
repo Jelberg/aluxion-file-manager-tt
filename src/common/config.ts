@@ -17,6 +17,8 @@ export default registerAs('config', () => {
     api: {
       key: process.env.API_KEY,
       jwtSecret: process.env.JWT_SECRET,
+      keyRecovery: process.env.API_KEY_RECOVERY,
+      jwtSecretRecovery: process.env.JWT_SECRET_RECOVERY,
     },
   };
 });

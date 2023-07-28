@@ -21,6 +21,7 @@ import config from 'src/common/config';
 import * as AWS from 'aws-sdk';
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { FileEntity } from '../entities/file.entity';
 
 @ApiTags('File Endpoints')
 @Controller('files')
@@ -63,15 +64,13 @@ export class FilesController {
   @Post()
   @ApiOperation({ summary: 'Create File' })
   creator(@Body() payload: CreateFileDto) {
-    return {
-      payload: payload,
-    };
+    return this.filesService.create(payload);
   }
 
   @Put(':id')
   @ApiOperation({ summary: 'Update file by ID' })
   updated(@Param('id') id: number, @Body() payload: UpdateFileDto) {
-    return this.filesService.update(id, payload);
+    return this.filesService.updateName(id, payload);
   }
 
   @ApiOperation({ summary: 'Delete File by ID' })
@@ -85,21 +84,6 @@ export class FilesController {
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
   async upload(@UploadedFile() file: Express.Multer.File) {
-    console.log('upload');
-    console.log(file);
-    const s3 = new AWS.S3({
-      accessKeyId: this.configService.aws.key,
-      secretAccessKey: this.configService.aws.secret,
-    });
-
-    //const fileName = `${file.originalname}`;
-    const fileName = 'hola12347.jpg';
-    const params = {
-      Bucket: this.configService.aws.bucket,
-      Key: fileName,
-      Body: file.buffer,
-    };
-
-    return await s3.upload(params).promise();
+    return this.filesService.uploadFile(file);
   }
 }
