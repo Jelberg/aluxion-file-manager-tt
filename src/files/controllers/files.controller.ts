@@ -18,7 +18,8 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
 import { ConfigType } from '@nestjs/config';
 import config from 'src/common/config';
-import * as AWS from 'aws-sdk';
+import { IsUrl } from 'class-validator';
+
 import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { FileEntity } from '../entities/file.entity';
@@ -85,5 +86,15 @@ export class FilesController {
   @UseInterceptors(FileInterceptor('file'))
   async upload(@UploadedFile() file: Express.Multer.File) {
     return this.filesService.uploadFile(file);
+  }
+
+  @Post('upload-image-url')
+  async uploadFileFromUrl(@Body() body: { url: string }) {
+    const { url } = body;
+    console.log(url);
+    if (!url) {
+      throw new Error('Invalid Url.');
+    }
+    return await this.filesService.uploadImageUrl(url);
   }
 }

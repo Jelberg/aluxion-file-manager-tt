@@ -2,6 +2,8 @@ import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm/dist/common';
 import { Repository } from 'typeorm';
 import { isEmpty } from 'class-validator';
+import axios from 'axios';
+import { v4 as uuidv4 } from 'uuid';
 
 import { FileEntity } from '../entities/file.entity';
 import { CreateFileDto, UpdateFileDto } from '../dtos/files.dto';
@@ -82,6 +84,21 @@ export class FilesService {
         newFile.img = res.Location;
         return await this.filesService.create(newFile);
       });*/
+  }
+
+  async uploadImageUrl(url: string) {
+    const s3 = this.awsService.getS3Instance();
+    const response = await axios.get(url, { responseType: 'arraybuffer' });
+
+    const newFilename = `${uuidv4()}_${url.split('/').pop()}`;
+
+    const params = {
+      Bucket: this.configService.aws.bucket,
+      Key: newFilename,
+      Body: Buffer.from(response.data),
+    };
+
+    return await s3.upload(params).promise();
   }
 
   findAll() {
