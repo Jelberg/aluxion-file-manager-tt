@@ -44,12 +44,12 @@ export class UsersService {
     else return false;
   }
 
-  async findEmail(email: string): Promise<boolean> {
+  async findEmail(email: string) {
     const user = await this.userRepository.findOne({
       where: { email: email },
     });
-    if (user) true;
-    else return false;
+    if (!user) throw new NotFoundException(`Email: ${email} not found`);
+    else return user;
   }
 
   async create(data: CreateUserDto) {
@@ -73,6 +73,17 @@ export class UsersService {
       await this.isEmailExist(data.email);
     }
 
+    if (isNotEmpty(data.password)) {
+      (data.password as string) = await bcrypt.hash(data.password, 10);
+    }
+
+    const user = await this.findOne(id);
+    const updtUser = this.userRepository.merge(user, data);
+    console.log(updtUser);
+    return this.userRepository.save(updtUser);
+  }
+
+  async updatePassword(id: number, data: UpdateUserDto) {
     if (isNotEmpty(data.password)) {
       (data.password as string) = await bcrypt.hash(data.password, 10);
     }

@@ -17,8 +17,17 @@ export default registerAs('config', () => {
     api: {
       key: process.env.API_KEY,
       jwtSecret: process.env.JWT_SECRET,
-      keyRecovery: process.env.API_KEY_RECOVERY,
-      jwtSecretRecovery: process.env.JWT_SECRET_RECOVERY,
+      keyRecovery: process.env.API_KEY_RESET,
+      jwtSecretReset: process.env.JWT_SECRET_RESET,
+    },
+    mail: {
+      host: 'sandbox.smtp.mailtrap.io',
+      port: 2525,
+      secure: false,
+      auth: {
+        user: '920a9dd4767ab2',
+        pass: '82824d7f0dae81',
+      },
     },
   };
 });

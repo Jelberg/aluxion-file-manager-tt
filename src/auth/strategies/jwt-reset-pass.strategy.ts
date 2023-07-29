@@ -7,15 +7,15 @@ import config from 'src/common/config';
 import { PayloadToken } from '../models/token.model';
 
 @Injectable()
-export class JwtRecoveryPassStrategy extends PassportStrategy(
+export class JwtResetPassStrategy extends PassportStrategy(
   Strategy,
-  'jwt-recovery',
+  'jwtreset',
 ) {
   constructor(@Inject(config.KEY) configService: ConfigType<typeof config>) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.api.jwtSecretRecovery,
+      secretOrKey: configService.api.jwtSecretReset,
     });
   }
 

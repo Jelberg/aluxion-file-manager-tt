@@ -8,6 +8,7 @@ import { AuthService } from './services/auth.service';
 import { UsersModule } from 'src/users/users.module';
 import { LocalStrategy } from './strategies/local.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
+import { JwtResetPassStrategy } from './strategies/jwt-reset-pass.strategy';
 import { AuthController } from './controllers/auth.controller';
 import { MailerModule } from 'src/mailer/mailer.module';
 import config from 'src/common/config';
@@ -30,16 +31,16 @@ import { TokenEntity } from './entities/token.entity';
         };
       },
     }),
-    JwtModule.registerAsync({
+    /* JwtModule.registerAsync({
       inject: [config.KEY],
       useFactory: (configService: ConfigType<typeof config>) => {
         return {
-          secret: configService.api.jwtSecretRecovery,
+          secret: configService.api.jwtSecretReset,
         };
       },
-    }),
+    }),*/
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, LocalStrategy, JwtStrategy, JwtResetPassStrategy],
   controllers: [AuthController],
 })
 export class AuthModule {}
