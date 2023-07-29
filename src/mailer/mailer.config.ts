@@ -2,11 +2,11 @@
 import { registerAs } from '@nestjs/config';
 
 export default registerAs('mailer', () => ({
-  host: 'smtp.example.com',
-  port: 587,
+  host: 'sandbox.smtp.mailtrap.io',
+  port: 2525,
   secure: false, // Si utilizas SSL/TLS, cambia esto a 'true'
   auth: {
-    user: 'elbergjessica@gmail.com',
-    pass: 'Winterfell2019',
+    user: '920a9dd4767ab2',
+    pass: '82824d7f0dae81',
   },
 }));

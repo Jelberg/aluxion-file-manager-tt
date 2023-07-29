@@ -22,4 +22,24 @@ export class AwsService {
   getS3Instance(): AWS.S3 {
     return this.s3;
   }
+
+  async renameFile(oldKey: string, newKey: string) {
+    const s3 = this.getS3Instance();
+
+    const copyParams = {
+      Bucket: this.configService.aws.bucket,
+      //CopySource: `${this.configService.aws.bucket}/${oldKey}`,
+      CopySource: `https://aluxion-testing.s3.eu-west-1.amazonaws.com/${oldKey}`,
+      Key: newKey,
+    };
+
+    await s3.copyObject(copyParams).promise();
+
+    const deleteParams = {
+      Bucket: this.configService.aws.bucket,
+      Key: oldKey,
+    };
+
+    return await s3.deleteObject(deleteParams).promise();
+  }
 }

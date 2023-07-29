@@ -2,7 +2,7 @@ import {
   Controller,
   Get,
   Param,
-  Query,
+  Res,
   Body,
   Post,
   Delete,
@@ -13,16 +13,14 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FilesService } from '../services/files.service';
-import { UpdateFileDto, CreateFileDto } from '../dtos/files.dto';
+import { UpdateFileDto } from '../dtos/files.dto';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
 import { ConfigType } from '@nestjs/config';
 import config from 'src/common/config';
-import { IsUrl } from 'class-validator';
 
-import { S3Client, GetObjectCommand } from '@aws-sdk/client-s3';
+import { Response } from 'express';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { FileEntity } from '../entities/file.entity';
 
 @ApiTags('File Endpoints')
 @Controller('files')
@@ -32,21 +30,17 @@ export class FilesController {
     @Inject(config.KEY) private configService: ConfigType<typeof config>,
   ) {}
 
-  @Get('images')
-  async getImages(/*@Param('name') name: string*/) {
-    const client = new S3Client({});
-    const command = new GetObjectCommand({
-      Bucket: this.configService.aws.bucket,
-      Key: 'hola12347.jpg',
-    });
-
+  @Get('get-image/:objectKey')
+  async downloadImage(
+    @Param('objectKey') objectKey: string,
+    @Res() res: Response,
+  ) {
     try {
-      const response = await client.send(command);
-      // The Body object also has 'transformToByteArray' and 'transformToWebStream' methods.
-      const str = await response.Body.transformToString();
-      console.log(str);
-    } catch (err) {
-      console.error(err);
+      const imageBuffer = await this.filesService.downloadImage(objectKey);
+      res.contentType('image/jpeg'); // O ajusta el tipo de contenido adecuado de la imagen
+      res.send(imageBuffer);
+    } catch (error) {
+      res.status(404).send('No se encontró la imagen.');
     }
   }
 
@@ -62,13 +56,14 @@ export class FilesController {
     return this.filesService.findAll();
   }
 
+  /*
   @Post()
   @ApiOperation({ summary: 'Create File' })
   creator(@Body() payload: CreateFileDto) {
     return this.filesService.create(payload);
-  }
+  }*/
 
-  @Put(':id')
+  @Put('change-name/:id')
   @ApiOperation({ summary: 'Update file by ID' })
   updated(@Param('id') id: number, @Body() payload: UpdateFileDto) {
     return this.filesService.updateName(id, payload);

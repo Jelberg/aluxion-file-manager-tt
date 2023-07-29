@@ -1,10 +1,10 @@
-import { IsString, IsNotEmpty, IsUrl } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
 import { PartialType } from '@nestjs/swagger';
 
 export class CreateFileDto {
   @IsString()
   @IsNotEmpty()
-  readonly name: string;
+  readonly key: string;
 
   @IsString()
   @IsNotEmpty()

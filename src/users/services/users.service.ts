@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm/dist/common';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 
-import { FilesService } from 'src/files/services/files.service';
 import { CreateUserDto, UpdateUserDto } from '../dtos/users.dto';
 import { isNotEmpty } from 'class-validator';
 
@@ -13,8 +12,6 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
-
-    private filesService: FilesService,
   ) {}
 
   async login(email: string, password: string) {
@@ -44,6 +41,14 @@ export class UsersService {
       where: { email: email },
     });
     if (user) throw new NotFoundException(`Email: ${email} is already taken`);
+    else return false;
+  }
+
+  async findEmail(email: string): Promise<boolean> {
+    const user = await this.userRepository.findOne({
+      where: { email: email },
+    });
+    if (user) true;
     else return false;
   }
 
@@ -82,13 +87,5 @@ export class UsersService {
     return await this.findOne(id).then(async () => {
       return await this.userRepository.delete(id);
     });
-  }
-
-  fetchFiles(id: number) {
-    const user = this.findOne(id);
-    return {
-      user,
-      files: this.filesService.findOne(id),
-    };
   }
 }

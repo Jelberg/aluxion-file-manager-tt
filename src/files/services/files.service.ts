@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { FileEntity } from '../entities/file.entity';
 import { CreateFileDto, UpdateFileDto } from '../dtos/files.dto';
 import { AwsService } from 'src/aws/services/aws.service';
+import { UsersService } from 'src/users/services/users.service';
 
 import { ConfigType } from '@nestjs/config';
 import config from './../../common/config';
@@ -18,13 +19,14 @@ export class FilesService {
     @InjectRepository(FileEntity)
     private fileRepository: Repository<FileEntity>,
     private awsService: AwsService,
+    private usersService: UsersService,
     @Inject(config.KEY) private configService: ConfigType<typeof config>,
   ) {}
 
   private files: FileEntity[] = [
     {
       id: 1,
-      name: 'Image',
+      key: 'Image',
       img: 'this is a image',
     },
   ];
@@ -34,22 +36,29 @@ export class FilesService {
   }
 
   async updateName(id: number, data: UpdateFileDto) {
-    if (isEmpty(data.name)) {
-      throw new NotFoundException(`Name Fils is empty`);
+    if (isEmpty(data.key)) {
+      throw new NotFoundException(`Key is empty`);
     }
     const file = await this.fileRepository.findOne({ where: { id: id } });
-
     if (isEmpty(file)) {
       throw new NotFoundException(`File Not Found`);
     }
 
-    const updtFile = this.fileRepository.merge(file, data);
-    return this.fileRepository.save(updtFile);
+    return await this.awsService.renameFile(file.key, data.key).then((item) => {
+      console.log(item);
+      /*const updtFile = new FileEntity()
+      updtFile.img = item.data.Location
+      updtFile.key = item.Key
+      const newFile = this.fileRepository.merge(file, updtFile);
+      return this.fileRepository.save(newFile);*/
+    });
   }
 
   async uploadFile(file: any) {
-    console.log('upload');
     console.log(file);
+    const user = await this.usersService.findOne(file.user_id);
+    if (!user)
+      throw new NotFoundException(`User with id ${file.user_id} not found`);
 
     const s3 = this.awsService.getS3Instance();
     const fileName = 'hola12347.jpg';
@@ -60,30 +69,15 @@ export class FilesService {
       Body: file.buffer,
     };
 
-    return await s3.upload(params).promise();
-
-    /* const s3 = new AWS.S3({
-      accessKeyId: this.configService.aws.key,
-      secretAccessKey: this.configService.aws.secret,
-    });
-
-    //const fileName = `${file.originalname}`;
-    const fileName = 'hola12347.jpg';
-    const params = {
-      Bucket: this.configService.aws.bucket,
-      Key: fileName,
-      Body: file.buffer,
-    };
-
-    await s3
+    return await s3
       .upload(params)
       .promise()
       .then(async (res) => {
         const newFile = new FileEntity();
-        newFile.name = res.Key;
+        newFile.key = res.Key;
         newFile.img = res.Location;
-        return await this.filesService.create(newFile);
-      });*/
+        return await this.create(newFile);
+      });
   }
 
   async uploadImageUrl(url: string) {
@@ -109,5 +103,24 @@ export class FilesService {
     const file = this.files.find((item) => item.id == id);
     if (!file) throw new NotFoundException(`File ${id} not found`);
     else return file;
+  }
+
+  async downloadImage(objectKey: string): Promise<Buffer> {
+    const params = {
+      Bucket: this.configService.aws.bucket,
+      Key: objectKey,
+    };
+
+    try {
+      const data = await this.awsService
+        .getS3Instance()
+        .getObject(params)
+        .promise();
+      return data.Body as Buffer;
+    } catch (error) {
+      // Maneja errores, como objeto no encontrado, permisos insuficientes, etc.
+      console.error('Error al descargar la imagen desde S3:', error);
+      throw new Error('No se pudo descargar la imagen desde S3.');
+    }
   }
 }

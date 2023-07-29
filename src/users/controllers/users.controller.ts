@@ -19,7 +19,7 @@ import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('User Endpoints')
 //@UseGuards(ApiKeyGuard)
-@UseGuards(AuthGuard('jwt'))
+//@UseGuards(AuthGuard('jwt'))
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
@@ -56,9 +56,9 @@ export class UsersController {
     return this.usersService.delete(id);
   }
 
-  @Get(':id/files')
+  /*@Get(':id/files')
   @ApiOperation({ summary: 'Fetch files by user ID' })
   getFiles(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.fetchFiles(id);
-  }
+  }*/
 }
