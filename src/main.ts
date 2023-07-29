@@ -2,7 +2,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { ValidationPipe, ClassSerializerInterceptor } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-
+require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 

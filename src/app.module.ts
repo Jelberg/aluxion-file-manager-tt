@@ -12,6 +12,7 @@ import { AuthModule } from './auth/auth.module';
 import { MailerModule } from './mailer/mailer.module';
 
 import config from './common/config';
+require('aws-sdk/lib/maintenance_mode_message').suppress = true;
 
 @Module({
   imports: [
