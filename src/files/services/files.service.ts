@@ -23,10 +23,21 @@ export class FilesService {
     @Inject(config.KEY) private configService: ConfigType<typeof config>,
   ) {}
 
+  /**
+   * Guarda informacion de los archivos en la base de datos
+   * @param payload
+   * @returns
+   */
   async create(payload: CreateFileDto) {
     return await this.fileRepository.save(payload);
   }
 
+  /**
+   * Funcion actualiza el nombre del archivo en S3 y el la base de datos
+   * @param id
+   * @param data
+   * @returns
+   */
   async updateName(id: number, data: UpdateFileDto) {
     if (isEmpty(data.key)) {
       throw new NotFoundException(`Key is empty`);
@@ -46,8 +57,12 @@ export class FilesService {
     });
   }
 
+  /**
+   * Caraga la imagen al Bucket de S3
+   * @param file
+   * @returns
+   */
   async uploadFile(file: any) {
-    console.log(file);
     const user = await this.usersService.findOne(file.user_id);
     if (!user)
       throw new NotFoundException(`User with id ${file.user_id} not found`);
@@ -72,6 +87,11 @@ export class FilesService {
       });
   }
 
+  /**
+   * Carga la imagen segun url al Bucket S3
+   * @param url
+   * @returns
+   */
   async uploadImageUrl(url: string) {
     const s3 = this.awsService.getS3Instance();
     const response = await axios.get(url, { responseType: 'arraybuffer' });
@@ -105,6 +125,11 @@ export class FilesService {
     else return file;
   }*/
 
+  /**
+   * Descarga la imagen del Bucket dada la key
+   * @param objectKey
+   * @returns
+   */
   async downloadImage(objectKey: string): Promise<Buffer> {
     const params = {
       Bucket: this.configService.aws.bucket,

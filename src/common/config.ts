@@ -21,12 +21,12 @@ export default registerAs('config', () => {
       jwtSecretReset: process.env.JWT_SECRET_RESET,
     },
     mail: {
-      host: 'sandbox.smtp.mailtrap.io',
-      port: 2525,
+      host: process.env.MAIL_HOST,
+      port: process.env.MAIL_PORT,
       secure: false,
       auth: {
-        user: '920a9dd4767ab2',
-        pass: '82824d7f0dae81',
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS,
       },
     },
   };

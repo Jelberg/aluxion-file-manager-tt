@@ -10,10 +10,12 @@ export class MailerService {
   constructor(
     private readonly configService: ConfigService,
     @Inject(config.KEY) private conService: ConfigType<typeof config>,
-  ) {
-    this.mailerConfig = this.configService.get('mailer');
-  }
+  ) {}
 
+  /**
+   * Carga los datos para inicializar los envios de correo
+   * @returns
+   */
   mailerInfo() {
     return {
       host: this.conService.mail.host,
@@ -26,6 +28,12 @@ export class MailerService {
     };
   }
 
+  /**
+   * Envia correo
+   * @param to
+   * @param subject
+   * @param text
+   */
   async sendEmail(to: string, subject: string, text: string): Promise<void> {
     const info = this.mailerInfo();
     const transporter = nodemailer.createTransport(info);

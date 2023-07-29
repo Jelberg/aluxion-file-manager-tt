@@ -6,6 +6,9 @@ import { Strategy, ExtractJwt } from 'passport-jwt';
 import config from 'src/common/config';
 import { PayloadToken } from '../models/token.model';
 
+/**
+ * Estrategia para validar el JWT
+ */
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(@Inject(config.KEY) configService: ConfigType<typeof config>) {
@@ -16,6 +19,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
     });
   }
 
+  /**
+   * Valida el formato del token
+   * @param payload
+   * @returns
+   */
   validate(payload: PayloadToken) {
     return payload;
   }

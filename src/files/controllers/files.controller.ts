@@ -30,6 +30,7 @@ export class FilesController {
   ) {}
 
   @Get('get-image/:objectKey')
+  @ApiOperation({ summary: 'Download image from url' })
   async downloadImage(
     @Param('objectKey') objectKey: string,
     @Res() res: Response,
@@ -43,47 +44,21 @@ export class FilesController {
     }
   }
 
-  /*@Get(':id')
-  @ApiOperation({ summary: 'Get file by ID' })
-  getfile(@Param('id', ParseIntPipe) id: number) {
-    return this.filesService.findOne(id);
-  }
-
-  @Get('all')
-  @ApiOperation({ summary: 'Get all files' })
-  all() {
-    return this.filesService.findAll();
-  }
-
-  /*
-  @Post()
-  @ApiOperation({ summary: 'Create File' })
-  creator(@Body() payload: CreateFileDto) {
-    return this.filesService.create(payload);
-  }*/
-
   @Put('change-name/:id')
-  @ApiOperation({ summary: 'Update file by ID' })
+  @ApiOperation({ summary: 'Change name' })
   updated(@Param('id') id: number, @Body() payload: UpdateFileDto) {
     return this.filesService.updateName(id, payload);
   }
 
-  /*
-  @ApiOperation({ summary: 'Delete File by ID' })
-  @Delete(':id')
-  delete(@Param('id') id: number) {
-    return {
-      id: id,
-    };
-  }*/
-
   @Post('upload')
+  @ApiOperation({ summary: 'Upload image from desktop' })
   @UseInterceptors(FileInterceptor('file'))
   async upload(@UploadedFile() file: Express.Multer.File) {
     return this.filesService.uploadFile(file);
   }
 
   @Post('upload-image-url')
+  @ApiOperation({ summary: 'Upload image from url' })
   async uploadFileFromUrl(@Body() body: { url: string }) {
     const { url } = body;
     if (!url) {

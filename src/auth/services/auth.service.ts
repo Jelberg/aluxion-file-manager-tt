@@ -18,10 +18,21 @@ export class AuthService {
     private mailerService: MailerService,
   ) {}
 
+  /**
+   * Valida el usuario usando la estrategia para mensajes de autorizacion
+   * @param email
+   * @param password
+   * @returns
+   */
   async validateUser(email: string, password: string) {
     return await this.usersService.login(email, password);
   }
 
+  /**
+   * Genera el token
+   * @param user
+   * @returns
+   */
   generateJWT(user: UserEntity) {
     const payload: PayloadToken = { email: user.email, sub: user.id };
     return {
@@ -30,13 +41,18 @@ export class AuthService {
     };
   }
 
+  /*
   async saveTokenRecoveryPassword(email: string) {
     const isExist = this.usersService.findEmail(email);
     if (!isExist) throw new NotFoundException(`Email ${email} not found`);
-
     return;
-  }
+  }*/
 
+  /**
+   * Funcion llama al servicio de envio de email para mandar datos del token
+   * @param email
+   * @returns
+   */
   async sendEmail(email: string) {
     const user = await this.usersService.findEmail(email);
 
@@ -50,6 +66,11 @@ export class AuthService {
     return this.mailerService.sendEmail(email, subject, message);
   }
 
+  /**
+   * Funcion actualiza password usando token de valido
+   * @param data
+   * @returns
+   */
   async resetPassword(data) {
     const user = await this.usersService.findEmail(data.email);
     const newData = data as UpdateUserDto;

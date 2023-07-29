@@ -19,10 +19,20 @@ export class AwsService {
     this.s3 = new AWS.S3();
   }
 
+  /**
+   * Crea una instancia de S3
+   * @returns
+   */
   getS3Instance(): AWS.S3 {
     return this.s3;
   }
 
+  /**
+   * Actuliza el nombre anterior por el nuevo
+   * @param oldKey
+   * @param newKey
+   * @returns
+   */
   async renameFile(oldKey: string, newKey: string) {
     const s3 = this.getS3Instance();
     const copyParams = {

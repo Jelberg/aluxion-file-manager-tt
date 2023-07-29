@@ -5,6 +5,9 @@ import { Strategy } from 'passport-local';
 import { AuthService } from './../services/auth.service';
 import { LoginDto } from '../dtos/login.dto';
 
+/**
+ * Estrategia para validar login del usuario
+ */
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   constructor(private authService: AuthService) {

@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import mailerConfig from './mailer.config';
 import { ConfigModule } from '@nestjs/config';
 import { MailerService } from './services/mailer.service';
 
@@ -7,7 +6,6 @@ import { MailerService } from './services/mailer.service';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [mailerConfig],
     }),
   ],
   providers: [MailerService],

@@ -4,10 +4,8 @@ import { Request } from 'express';
 import { LoginDto } from '../dtos/login.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthService } from '../services/auth.service';
-import { MailerService } from 'src/mailer/services/mailer.service';
-import { ResetPasswordDto } from '../dtos/resetPasswordReset.dto';
 import { UserEntity } from 'src/users/entities/user.entity';
-import { UsersService } from 'src/users/services/users.service';
+
 @ApiTags('Auth Endpoints')
 @Controller('auth')
 export class AuthController {
@@ -25,7 +23,6 @@ export class AuthController {
   @Post('email-reset/:email')
   @ApiOperation({ summary: 'Send Email for password reset' })
   emailPassword(@Param('email') email: string) {
-    console.log(email);
     return this.authService.sendEmail(email);
   }
 
