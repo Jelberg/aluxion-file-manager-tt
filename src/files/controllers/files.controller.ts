@@ -10,6 +10,7 @@ import {
   Inject,
   UploadedFile,
   UseInterceptors,
+  BadRequestException,
 } from '@nestjs/common';
 import { FilesService } from '../services/files.service';
 import { UpdateFileDto } from '../dtos/files.dto';

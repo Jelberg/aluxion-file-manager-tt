@@ -1,9 +1,14 @@
-import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  Inject,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm/dist/common';
 import { Repository } from 'typeorm';
 import { isEmpty } from 'class-validator';
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
+import { extname } from 'path';
 
 import { FileEntity } from '../entities/file.entity';
 import { CreateFileDto, UpdateFileDto } from '../dtos/files.dto';
@@ -63,28 +68,33 @@ export class FilesService {
    * @returns
    */
   async uploadFile(file: any) {
-    const user = await this.usersService.findOne(file.user_id);
-    if (!user)
-      throw new NotFoundException(`User with id ${file.user_id} not found`);
+    if (this.isFileExtensionValid(file.originalname)) {
+      const user = await this.usersService.findOne(file.user_id);
+      if (!user)
+        throw new NotFoundException(`User with id ${file.user_id} not found`);
+      const s3 = this.awsService.getS3Instance();
+      const newFilename = `${file.originalname}`;
+      const params = {
+        Bucket: this.configService.aws.bucket,
+        Key: newFilename,
+        Body: file.buffer,
+      };
+      return await this.saveImageS3(s3, params);
+    } else
+      throw new BadRequestException(
+        'The file is not of type JPG (JEPG) or PNG',
+      );
+  }
 
-    const s3 = this.awsService.getS3Instance();
-
-    const newFilename = `${file.originalname}`;
-    const params = {
-      Bucket: this.configService.aws.bucket,
-      Key: newFilename,
-      Body: file.buffer,
-    };
-
-    return await s3
-      .upload(params)
-      .promise()
-      .then(async (res) => {
-        const newFile = new FileEntity();
-        newFile.key = res.Key;
-        newFile.img = res.Location;
-        return await this.create(newFile);
-      });
+  /**
+   * Valida la extencion del archivo
+   * @param originalname
+   * @returns
+   */
+  private isFileExtensionValid(originalname: string): boolean {
+    const allowedExtensions = ['.jpg', '.jpeg', '.png'];
+    const fileExtension = extname(originalname).toLowerCase();
+    return allowedExtensions.includes(fileExtension);
   }
 
   /**
@@ -104,6 +114,10 @@ export class FilesService {
       Body: Buffer.from(response.data),
     };
 
+    return await this.saveImageS3(s3, params);
+  }
+
+  async saveImageS3(s3, params) {
     return await s3
       .upload(params)
       .promise()
