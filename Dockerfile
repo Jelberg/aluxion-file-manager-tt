@@ -10,7 +10,7 @@ COPY . .
 
 RUN ls
 
-RUN npx aws-sdk-js-codemod -t v2-to-v3 src
+RUN npx aws-sdk-js-codemod -t v2-to-v3 src/*
 
 # Expón el puerto que utiliza tu aplicación de NestJS (el mismo que tienes configurado en tu aplicación)
 #EXPOSE 3000

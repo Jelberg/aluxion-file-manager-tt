@@ -2,7 +2,7 @@
 
 El el repositorio existe el archivo .env.example, dicho archivo se debe de modificar los artributos relacionados a AWS
 
-Nota: Para la configuracion de correo cree una cuenta en Mailtrap el cual ofrece configuracion gratuita, alli llegan los correo del realizados por el emisor.
+Nota: Las varibles de entorno relacionadas al email tambien se modifican, en mi caso cree una cuenta en mailtrap que me proporciono configuracion gratuita y alli llegan los correos emitidos con la informacion del token.
 
 1. Ubicarse dentro de la carpeta del proyecto u ejecutar
 
