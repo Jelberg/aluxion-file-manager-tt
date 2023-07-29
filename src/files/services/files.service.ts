@@ -23,14 +23,6 @@ export class FilesService {
     @Inject(config.KEY) private configService: ConfigType<typeof config>,
   ) {}
 
-  private files: FileEntity[] = [
-    {
-      id: 1,
-      key: 'Image',
-      img: 'this is a image',
-    },
-  ];
-
   async create(payload: CreateFileDto) {
     return await this.fileRepository.save(payload);
   }
@@ -61,11 +53,11 @@ export class FilesService {
       throw new NotFoundException(`User with id ${file.user_id} not found`);
 
     const s3 = this.awsService.getS3Instance();
-    const fileName = 'hola12347.jpg';
 
+    const newFilename = `${file.originalname}`;
     const params = {
       Bucket: this.configService.aws.bucket,
-      Key: fileName,
+      Key: newFilename,
       Body: file.buffer,
     };
 
@@ -84,7 +76,7 @@ export class FilesService {
     const s3 = this.awsService.getS3Instance();
     const response = await axios.get(url, { responseType: 'arraybuffer' });
 
-    const newFilename = `${uuidv4()}_${url.split('/').pop()}`;
+    const newFilename = `${url.split('/').pop()}`;
 
     const params = {
       Bucket: this.configService.aws.bucket,
@@ -92,10 +84,18 @@ export class FilesService {
       Body: Buffer.from(response.data),
     };
 
-    return await s3.upload(params).promise();
+    return await s3
+      .upload(params)
+      .promise()
+      .then(async (res) => {
+        const newFile = new FileEntity();
+        newFile.key = res.Key;
+        newFile.img = res.Location;
+        return await this.create(newFile);
+      });
   }
 
-  findAll() {
+  /*findAll() {
     return this.files;
   }
 
@@ -103,7 +103,7 @@ export class FilesService {
     const file = this.files.find((item) => item.id == id);
     if (!file) throw new NotFoundException(`File ${id} not found`);
     else return file;
-  }
+  }*/
 
   async downloadImage(objectKey: string): Promise<Buffer> {
     const params = {
@@ -116,11 +116,12 @@ export class FilesService {
         .getS3Instance()
         .getObject(params)
         .promise();
+
+      if (isEmpty(data.Body)) throw new NotFoundException(`Image not found`);
+
       return data.Body as Buffer;
     } catch (error) {
-      // Maneja errores, como objeto no encontrado, permisos insuficientes, etc.
-      console.error('Error al descargar la imagen desde S3:', error);
-      throw new Error('No se pudo descargar la imagen desde S3.');
+      throw new Error('Download error S3');
     }
   }
 }

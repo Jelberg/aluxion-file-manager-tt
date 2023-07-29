@@ -15,13 +15,6 @@ export class AuthController {
     private mailerService: MailerService,
   ) {}
 
-  /*@UseGuards(AuthGuard('local'))
-  @Post('login')
-  @ApiOperation({ summary: 'Login' })
-  login(@Body() login: LoginDto) {
-    return this.authService.validateUser(login)
-  }*/
-
   @UseGuards(AuthGuard('local'))
   @Post('login')
   @ApiOperation({ summary: 'Login' })

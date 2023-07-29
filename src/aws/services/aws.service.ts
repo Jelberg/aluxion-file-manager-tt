@@ -25,11 +25,9 @@ export class AwsService {
 
   async renameFile(oldKey: string, newKey: string) {
     const s3 = this.getS3Instance();
-
     const copyParams = {
       Bucket: this.configService.aws.bucket,
-      //CopySource: `${this.configService.aws.bucket}/${oldKey}`,
-      CopySource: `https://aluxion-testing.s3.eu-west-1.amazonaws.com/${oldKey}`,
+      CopySource: `${this.configService.aws.bucket}/${oldKey}`,
       Key: newKey,
     };
 

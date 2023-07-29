@@ -1,4 +1,10 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  PrimaryColumn,
+  BeforeInsert,
+} from 'typeorm';
 
 @Entity({ name: 'files_alux' })
 export class FileEntity {

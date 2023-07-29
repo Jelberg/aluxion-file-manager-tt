@@ -7,7 +7,6 @@ import {
   Post,
   Delete,
   Put,
-  ParseIntPipe,
   Inject,
   UploadedFile,
   UseInterceptors,
@@ -37,14 +36,14 @@ export class FilesController {
   ) {
     try {
       const imageBuffer = await this.filesService.downloadImage(objectKey);
-      res.contentType('image/jpeg'); // O ajusta el tipo de contenido adecuado de la imagen
+      res.contentType('image/jpeg');
       res.send(imageBuffer);
     } catch (error) {
       res.status(404).send('No se encontró la imagen.');
     }
   }
 
-  @Get(':id')
+  /*@Get(':id')
   @ApiOperation({ summary: 'Get file by ID' })
   getfile(@Param('id', ParseIntPipe) id: number) {
     return this.filesService.findOne(id);
@@ -69,13 +68,14 @@ export class FilesController {
     return this.filesService.updateName(id, payload);
   }
 
+  /*
   @ApiOperation({ summary: 'Delete File by ID' })
   @Delete(':id')
   delete(@Param('id') id: number) {
     return {
       id: id,
     };
-  }
+  }*/
 
   @Post('upload')
   @UseInterceptors(FileInterceptor('file'))
@@ -86,9 +86,8 @@ export class FilesController {
   @Post('upload-image-url')
   async uploadFileFromUrl(@Body() body: { url: string }) {
     const { url } = body;
-    console.log(url);
     if (!url) {
-      throw new Error('Invalid Url.');
+      throw new Error('Invalid Url');
     }
     return await this.filesService.uploadImageUrl(url);
   }
