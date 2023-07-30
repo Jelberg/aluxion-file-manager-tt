@@ -1,0 +1,33 @@
+version: '3'
+services:
+  db:
+    image: postgres:13
+    restart: always
+    environment:
+      - POSTGRES_DB=db_tt_aluxion
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=1234
+    ports:
+      - '5444:5444' # Mapea el puerto 5432 del contenedor al puerto 5432 del host
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    ports:
+      - '3000:3000' # Mapea el puerto 3000 del contenedor al puerto 3000 del host
+    depends_on:
+      - db # Dependencia en el servicio de la base de datos
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=root@localhost.com
+      - PGADMIN_DEFAULT_PASSWORD=root
+    ports:
+      - '5050:80'
+    depends_on:
+      - db # Dependencia en el servicio de la base de datos
+
+volumes:
+  postgres_data: # Volumen para persistir los datos de la base de datos
